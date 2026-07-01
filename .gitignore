@@ -1,5 +1,4 @@
 # Desktop version files (not needed for PWA)
-index.html
 *.app
 VERSION.md
 icon-*.png
