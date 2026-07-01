@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<title>Basic English 850 — 单词训练器</title>
+<title>Basic 850 — PWA</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Basic 850">
 <meta name="theme-color" content="#b8860b">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest-pwa.json">
 <link rel="apple-touch-icon" href="lina-macos.png">
 <link rel="icon" href="lina-macos.png">
 <style>
@@ -226,6 +226,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",syste
 .speak-inline{cursor:pointer;font-size:0.8rem;padding:1px 3px;transition:all 0.15s;display:inline-block;}
 .speak-inline:hover{transform:scale(1.3);}
 .speak-inline.speaking{animation:pulse 0.5s ease-in-out infinite;}
+/* ===== PWA Mobile ===== */
+body{padding-bottom:80px !important;}
+.header{position:fixed;top:0;left:0;right:0;z-index:100;padding-top:env(safe-area-inset-top,0);}
+.main{padding-top:80px;}
+.mode-tabs{display:none !important;}
+.write-layout{grid-template-columns:1fr !important;}
+.fc-btn{padding:14px 20px;font-size:1rem;}
+.footer{display:none;}
+.pwa-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;background:var(--card);border-top:1px solid var(--border);padding:4px 2px env(safe-area-inset-bottom,0);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.pwa-nav-btn{flex:1;min-width:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 2px;border:none;background:none;color:var(--text2);font-size:0.6rem;cursor:pointer;gap:1px;white-space:nowrap;}
+.pwa-nav-btn .ni{font-size:1.3rem;line-height:1;}
+.pwa-nav-btn.active{color:var(--accent);}
 </style>
 </head>
 <body>
@@ -1864,6 +1876,48 @@ init();
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
+// PWA bottom nav
+(function(){
+  const navModes = [
+    {m:'browse', i:'📋', l:'浏览'},
+    {m:'flashcard', i:'🃏', l:'闪卡'},
+    {m:'quiz', i:'🎯', l:'测验'},
+    {m:'daily', i:'📅', l:'每日'},
+    {m:'article', i:'📝', l:'文章'},
+    {m:'write', i:'✍️', l:'写作'},
+    {m:'speech', i:'🗣️', l:'连读'},
+  ];
+  const nav = document.createElement('div');
+  nav.className = 'pwa-nav';
+  nav.id = 'pwaNav';
+  nav.innerHTML = navModes.map(n =>
+    `<button class="pwa-nav-btn${currentMode===n.m?' active':''}" data-m="${n.m}"><span class="ni">${n.i}</span>${n.l}</button>`
+  ).join('');
+  document.body.appendChild(nav);
+  nav.addEventListener('click', e => {
+    const btn = e.target.closest('.pwa-nav-btn');
+    if (!btn) return;
+    const m = btn.dataset.m;
+    currentMode = m; fcQueue=[]; fcIdx=0; qzWord=null; qzScore=0; qzTotal=0;
+    dpPhase='config'; dpWords=buildDailyPlan(); dpIdx=0; dpCorrect=0; dpWrongList=[]; dpHistory=[];
+    speechMode='browse'; speechQuizIdx=0; speechQuizItem=null;
+    articleIdx=0; articleAnswers={};
+    document.querySelectorAll('.pwa-nav-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCategoryTabs(); renderContent();
+    document.getElementById('categoryTabs').style.display =
+      ['browse','flashcard','quiz','daily'].includes(m) ? '' : 'none';
+    window.scrollTo(0,0);
+  });
+  // Update active on mode switch
+  const origRender = renderContent;
+  renderContent = function(){
+    document.querySelectorAll('.pwa-nav-btn').forEach(b=>{
+      b.classList.toggle('active', b.dataset.m === currentMode);
+    });
+    return origRender();
+  };
+})();
 </script>
 </body>
 </html>
