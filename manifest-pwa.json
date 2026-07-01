@@ -2,15 +2,32 @@
   "name": "Basic 850 Trainer",
   "short_name": "Basic850",
   "description": "C.K. Ogden Basic English 850 单词训练器 - PWA版",
-  "start_url": "./index-pwa.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#faf9f6",
   "theme_color": "#b8860b",
   "icons": [
-    {"src":"lina-macos.png","sizes":"1024x1024","type":"image/png","purpose":"any maskable"},
-    {"src":"lina-macos.png","sizes":"512x512","type":"image/png"},
-    {"src":"lina-macos.png","sizes":"192x192","type":"image/png"},
-    {"src":"lina-macos.png","sizes":"180x180","type":"image/png"}
+    {
+      "src": "lina-macos.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "lina-macos.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "lina-macos.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "lina-macos.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
   ]
 }

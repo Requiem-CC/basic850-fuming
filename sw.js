@@ -1,6 +1,6 @@
 const CACHE_NAME = 'basic850-pwa-v1';
 const PRE_CACHE = [
-  './index-pwa.html',
+  './index.html',
   './manifest-pwa.json',
   './lina-macos.png',
 ];
@@ -39,9 +39,9 @@ self.addEventListener('fetch', e => {
         }
         return resp;
       }).catch(() => {
-        // If HTML request fails, return cached index-pwa.html
+        // If HTML request fails, return cached index.html
         if (e.request.headers.get('accept')?.includes('text/html')) {
-          return caches.match('./index-pwa.html');
+          return caches.match('./index.html');
         }
       });
     })
