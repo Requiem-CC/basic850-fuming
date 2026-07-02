@@ -1,4 +1,4 @@
-const CACHE_NAME = 'basic850-pwa-v1';
+const CACHE_NAME = 'basic850-pwa-v2';
 const PRE_CACHE = [
   './index.html',
   './manifest-pwa.json',
