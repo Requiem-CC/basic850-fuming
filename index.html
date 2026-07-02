@@ -95,10 +95,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",syste
 .fc-progress-fill{height:100%;background:var(--progress-fill);transition:width 0.3s;}
 
 /* Quiz mode */
-.qz-wrap{max-width:500px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:20px;}
-.qz-word{font-size:2.5rem;font-weight:700;letter-spacing:-0.5px;text-align:center;padding:20px;}
-.qz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
-.qz-opt{padding:16px;border-radius:12px;border:2px solid var(--border);background:var(--card);font-size:1rem;cursor:pointer;transition:all 0.2s;text-align:center;color:var(--text);}
+.qz-wrap{max-width:500px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.qz-word{font-size:1.8rem;font-weight:700;letter-spacing:-0.5px;text-align:center;padding:12px 0;}
+.qz-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;}
+.qz-opt{padding:12px;border-radius:10px;border:2px solid var(--border);background:var(--card);font-size:0.9rem;cursor:pointer;transition:all 0.2s;text-align:center;color:var(--text);}
 .qz-opt:hover{border-color:var(--accent);}
 .qz-opt.correct{border-color:var(--correct);background:#f0f7eb;}
 .qz-opt.wrong{border-color:var(--wrong);background:#fdf0ef;}
@@ -987,23 +987,45 @@ function renderQuiz() {
       });
       const fb = document.getElementById('qzFb');
       if (ok) {
-        qzScore++; knownWords.add(qzWord); delWrong(qzWord); saveKnown(); saveWrong(); renderCategoryTabs();
-        fb.textContent = '✅ 正确！已自动标记为掌握';
-        fb.style.color = 'var(--correct)';
+        qzScore++;
+        fb.innerHTML = `
+          <span style="color:var(--correct);">✅ 正确！你是真的认识吗？</span>
+          <span style="display:flex;gap:8px;margin-top:6px;justify-content:center;">
+            <button class="q-opt" style="padding:6px 14px;font-size:0.85rem;border-color:var(--correct);" id="qzKnown">👆 认识</button>
+            <button class="q-opt" style="padding:6px 14px;font-size:0.85rem;border-color:var(--accent);" id="qzGuess">🤔 猜的</button>
+          </span>`;
+        fb.style.color = '';
+        // "认识" → mark as known
+        document.getElementById('qzKnown').addEventListener('click', () => {
+          knownWords.add(qzWord); delWrong(qzWord); saveKnown(); saveWrong(); renderCategoryTabs();
+          fb.textContent = '✅ 已标记为掌握！';
+          fb.style.color = 'var(--correct)';
+          showNext();
+        });
+        // "猜的" → add to wrong pool, don't mark known
+        document.getElementById('qzGuess').addEventListener('click', () => {
+          addWrong(qzWord); saveWrong();
+          fb.textContent = '📝 已加入错词池，下次再练！';
+          fb.style.color = 'var(--accent)';
+          showNext();
+        });
       } else {
         addWrong(qzWord); saveWrong();
         fb.textContent = `❌ "${qzWord}" 的意思是「${correct.zh}」`;
         fb.style.color = 'var(--wrong)';
+        showNext();
       }
-      // Update score line with LinaBell reaction
-      const acc = qzTotal > 0 ? Math.round(qzScore/qzTotal*100) : 0;
-      const sl = document.getElementById('qzScoreLine');
-      if (sl) {
-        const react = acc >= 80 ? '🦊✨' : acc >= 60 ? '🦊👍' : '🦊💦';
-        sl.textContent = `${react} 得分 ${qzScore}/${qzTotal} · 正确率 ${acc}%`;
+      function showNext() {
+        // Update score
+        const acc = qzTotal > 0 ? Math.round(qzScore/qzTotal*100) : 0;
+        const sl = document.getElementById('qzScoreLine');
+        if (sl) {
+          const react = acc >= 80 ? '🦊✨' : acc >= 60 ? '🦊👍' : '🦊💦';
+          sl.textContent = `${react} 得分 ${qzScore}/${qzTotal} · 正确率 ${acc}%`;
+        }
+        document.getElementById('qzNext').style.display = 'block';
+        document.getElementById('qzNext').focus();
       }
-      document.getElementById('qzNext').style.display = 'block';
-      document.getElementById('qzNext').focus();
     });
   });
 
