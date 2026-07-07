@@ -1570,6 +1570,7 @@ function renderWrite() {
       </div>
       <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
         <button class="fc-btn know" id="saveWriting">💾 保存到历史</button>
+	        <button class="fc-btn" id="newWriting">📄 新练习</button>
         <span id="saveMsg" style="font-size:0.8rem;color:var(--correct);"></span>
       </div>
       ${writeHistory.length > 0 ? `
@@ -1673,6 +1674,21 @@ function renderWrite() {
       title: text.trim().split('\n')[0]?.slice(0, 60) || '无标题'
     };
   }
+
+  document.getElementById('newWriting').addEventListener('click', () => {
+    const s = getWriteStats();
+    if (s.wordCount >= 10) {
+      const last = writeHistory[writeHistory.length - 1];
+      if (!last || last.text.trim().replace(/\s+/g,' ') !== s.text.trim().replace(/\s+/g,' ')) {
+        writeHistory.push({ id: Date.now(), date: new Date().toISOString().slice(0,10), ...s });
+        localStorage.setItem(WRITE_HISTORY_KEY, JSON.stringify(writeHistory));
+      }
+    }
+    document.getElementById('writeInput').value = '';
+    localStorage.setItem(WRITE_KEY, '');
+    document.getElementById('saveMsg').textContent = '📄 新练习开始！';
+    setTimeout(() => { document.getElementById('saveMsg').textContent = ''; renderWrite(); }, 800);
+  });
 
   document.getElementById('saveWriting').addEventListener('click', () => {
     const s = getWriteStats();
